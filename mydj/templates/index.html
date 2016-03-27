@@ -1,0 +1,73 @@
+{% load staticfiles %}
+<link href="{% static 'bootstrap/css/bootstrap.min.css' %}"  rel="stylesheet">
+<link href="{% static 'bootstrap-dialog/css/bootstrap-dialog.min.css' %}"  rel="stylesheet">
+  <!-- js -->
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/validate.js' %}"></script>
+<style>
+  .object_ok
+  {
+    font-size: small;
+    color: #333333;
+  }
+  .object_error
+  {
+    font-size: small;
+    color: red;
+  }
+  .tick{
+    position:absolute;
+    right:5px;
+    top:5px;
+  }
+</style>
+<input name="csrf_token" id="csrf_token" type="hidden" value="{{ csrf_token }}" >
+<div role="main" class="main-content">
+        
+<div class="jumbotron jumbotron-home jumbotron-inverse">
+  <div class="container-responsive">
+    <div class="row">
+      <div class="column col-xs-8">
+        <h1 class="display-heading-1 jumbotron-title">Your Opinion Matters!</h1>
+        <p class="display-intro jumbotron-lead">A place where you can vote on topics of your Interest.Let your voice be heard to the world,because Your Opinion Matters!!</p>
+      </div>
+
+      <div class="column col-xs-4">
+          <div class="d-none-sm-dn">
+            <form accept-charset="UTF-8" action="/home" autocomplete="off"  method="post" onsubmit="return validateUserData();">
+            {% csrf_token %}
+              <dl class="form">
+                <dd id="dd_user_login">
+                  <label class="form-label sr-only" for="user_login">Pick a username</label>
+                  <input type="text" id="user_login" name="user_login" class="form-control form-control-lg input-block" placeholder="Pick a username" onchange="checkAvailability(this.name,this.value);" onkeypress="dont_use_space()" autofocus>
+                </dd>
+                <p id="status_user_login" style="display: none"></p>
+              </dl>
+              <dl class="form">
+                <dd id="dd_user_email">
+                  <label class="form-label sr-only" for="user_email">Email address</label>
+                  <input type="text" id="user_email" name="user_email" class="form-control form-control-lg input-block js-email-notice-trigger" placeholder="Email address" onchange="checkAvailability(this.name,this.value);" onkeypress="dont_use_space()">
+                </dd>
+                <p id="status_user_email" style="display: none"></p>
+              </dl>
+              <dl class="form">
+                <dd>
+                  <label class="form-label sr-only" for="user[password]">Create a password</label>
+                  <input type="password" id="user_password" name="user_password" class="form-control form-control-lg input-block" placeholder="Create a password" >
+                </dd>
+              </dl>
+              <button class="btn btn-success" type="submit">Sign up for voting</button>
+          </form>
+            <p>
+               Already a member? Please
+                <a class="text-green" href="/login">Sign In</a>
+            </p>
+        </div>
+      </div>
+    
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,169 @@
+{% load staticfiles %}
+
+<link href="{% static 'bootstrap/css/bootstrap.min.css' %}"  rel="stylesheet">
+
+<!--js-->
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/validate.js' %}"></script>
+<style>
+     .nav-line{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        display: inline-block;
+        padding: 0 10px 0 10px;
+    }
+    .scrollable-div-inner {
+        overflow:auto;         
+        height:470px;
+    } 
+</style>
+
+
+<header>
+    <div class="panel-body">
+        <div class="col-xs-8"><a href="#"><img src="/static/images/logo.png" length="40" width="150" alt="Site Logo"></a></div>
+        <div class="col-xs-1"><a href="/createPoll" class="btn btn-success">Create a Poll</a></div>
+        <div class="col-xs-2">
+            <span class="nav-line">Welcome <label id="usernameLabel"></label></span>
+        </div>
+        <div class="col-xs-1">
+            <a href="#" onclick="logout()">Log out</a>
+        </div>
+    </div>
+    <div>
+        
+    </div>
+    <script type="text/javascript">
+        function showQuestion(pollId){
+            $("#question").val(pollId);
+            var url = "/polls/"+ pollId +"/"
+            $.getJSON(url,function(response){
+                    $("#c").css("display","none");
+                    options=JSON.parse(response.data)
+                    if(options.length>0){
+                        var i=1;
+                        $.each(options,function( key, val ) {
+                            $("#q_d").text("Select an Option to vote...")
+                            $("#options").css("display", "block");
+                            $("#op_desc"+i).text(val.fields.option_desc);
+                            i++;
+                          });
+                        if (response.already_answered ==1) {
+                            $("#q_d").text("You have already answered this Poll.").css("color","red")
+                            $("#"+response.option_id).attr("checked","true")
+                            $("#submit").attr("disabled",true);
+                        }
+                        else
+                        {
+                           $("#submit").attr("disabled",false);
+                           $("#q_d").css("color","black")
+                        }
+                    }
+                    else{
+                        alert("No details found.")
+                        $("#options").css("display", "none");
+                    }
+                });
+        }
+        function logout() {
+            clearCookies()
+            window.location.href = "/";
+        }
+
+        function submit() {
+            var username = $("#user").val()
+            var question_id = $("#question").val()
+            var option_id = $('input[name=op]:checked').attr("id");
+            var url = "/polls/"+ question_id +"/vote/"+username+"/"+option_id;
+            $.ajax({
+                dataType: "json",
+                url: url,
+                success: function(data){
+                        var option_id=data.id;
+                        if (option_id !="undefined") {
+                            $("#c").css("display","block");
+                            $("#submit").attr("disabled",true);
+                        }
+                        else{
+                            alert("Some Error has Occured!!")
+                        }
+                }
+              });
+        }
+        function setUserName() {
+            $("#user").val(getCookies("username"));
+            $("#usernameLabel").text(getCookies("username"));
+        }
+    </script>
+</header>
+<body  onload="setUserName()">
+    <input type="hidden" value="{{ user }}" id="user" name="user">
+    <input type="hidden" value="" id="question" name="question">
+</br>
+<hr>
+<div role="main" class="main-content">
+    <div class="column col-xs-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">                    
+            <span>Recent Questions</span>
+          </div>
+          <div style="font-size:12px;" class="panel-body">                     
+             <div  class="row scrollable-div-inner">
+                {% if latest_poll_list %}
+                <ul class="nav nav-pills nav-stacked">
+                {% for poll in latest_poll_list %}
+                    <li class="list_link"><a href="#" onclick="showQuestion('{{poll.id}}')">{{ poll.question_text }}
+                    </a></li>
+                {% endfor %}
+                </ul>
+                {% else %}
+                <p class=".navbar-text">No polls are available.</p>
+                {% endif %}
+            </div>
+          </div>                  
+        </div>
+    </div>
+    <div id="questionDetails" class="column col-xs-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">                    
+              <span id="q_d">Please select a Question:</span>
+            </div>
+            {% csrf_token %}
+            <div id="options" style="font-size:12px;display: none" class="panel-body"> 
+                <div class="input-group">
+                    <span class="input-group-addon">
+                      <input type="radio" name="op" id="1" aria-label="...">
+                    </span>
+                    <li id="op_desc1" class="list-group-item" aria-label="..." ></li>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                      <input type="radio" name="op" id="2" aria-label="...">
+                    </span>
+                    <li id="op_desc2" class="list-group-item" aria-label="..." ></li>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                      <input type="radio" name="op" id="3" aria-label="...">
+                    </span>
+                    <li id="op_desc3"id="op1_desc" class="list-group-item" aria-label="..." ></li>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                      <input type="radio" name="op" id="4" aria-label="...">
+                    </span>
+                    <li id="op_desc4" class="list-group-item" aria-label="..." ></li>
+                </div>
+                <br/>
+                <button id="submit" name="submit" onclick="submit()" class="btn btn-success center-block"> Submit Answer</button>
+            </div>
+        </div>
+        <p>
+        <font face="sans-serif" size="4" id="c" style="display: none" color="green">Your Answer has been Submitted Successfully!!.</font></p>
+    </div>
+        
+</div>
+</body>

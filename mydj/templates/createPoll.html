@@ -1,0 +1,103 @@
+{% load staticfiles %}
+<link href="{% static 'bootstrap/css/bootstrap.min.css' %}"  rel="stylesheet">
+<link href="{% static 'bootstrap-dialog/css/bootstrap-dialog.min.css' %}"  rel="stylesheet">
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/validate.js' %}"></script>
+<script type="text/javascript">
+function validate()
+{
+    if($("#question").val().length == 0)
+    {
+        alert("Please Enter the question.")
+        return false;
+    }
+    if($("#question").val().length < 300)
+    {
+        alert("Question should be atleast 300 characters long.")
+        return false;
+    }
+    var option_1_len = $("#option_1").val().length;
+    var option_2_len = $("#option_2").val().length;
+    var option_3_len = $("#option_3").val().length;
+    var option_4_len = $("#option_4").val().length;
+    
+    if(option_1_len == 0 || option_2_len == 0 || option_3_len == 0 || option_4_len == 0)
+    {
+        alert("Please give all the options.")
+        return false;
+    }
+
+    if(option_1_len > 60 || option_2_len > 60 || option_3_len > 60 || option_4_len > 60)
+    {
+        alert("Options should not be greater than 60 characters.")
+        return false;
+    }
+    return true;
+}
+</script>
+<input type="hidden" name="msg" id="msg" value="{{ msg }}">
+<div class="container">
+        <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+            <div class="panel panel-info" >
+                    <div class="panel-heading">
+                        <div class="panel-title">Create A Poll</div>
+                    </div>     
+
+                    <div style="padding-top:30px" class="panel-body" >
+                        <form id="createAPoll" class="form-horizontal" role="form" action="/createPoll" method="post" onsubmit="return validate()";>
+                            {% csrf_token %}
+                            <div style="margin-bottom: 25px" class="form-group">
+                                <label for="question"> Question:</label>
+                                <textarea placeholder = "(max 300 characters)" class="form-control" rows="5" name="question" id="question"></textarea>
+                            </div>
+                            
+                            <div>
+                                <div style="margin-bottom: 25px" class="input-group col-xs-6">
+                                    <span class="input-group-addon">A</span>
+                                    <input id="option_1" type="text" class="form-control" name="option_1" value="" placeholder="">                                        
+                                </div>
+                                <div style="margin-bottom: 25px" class="input-group">
+                                    <span class="input-group-addon">B</span>
+                                    <input id="option_2" type="text" class="form-control" name="option_2" value="" placeholder="">                                        
+                                </div>
+                            </div>
+                            <div>
+                                <div style="margin-bottom: 25px" class="input-group col-xs-6">
+                                    <span class="input-group-addon">C</span>
+                                    <input id="option_3" type="text" class="form-control" name="option_3" value="" placeholder="">                                        
+                                </div>
+                                <div style="margin-bottom: 25px" class="input-group">
+                                    <span class="input-group-addon">D</span>
+                                    <input id="option_4" type="text" class="form-control" name="option_4" value="" placeholder="">                                        
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top:10px" class="form-group">
+                                <div class="col-sm-6 controls">
+                                  <button class="btn btn-success center-block" type="submit">Save</button>
+                                </div>
+                                <div class="col-sm-6 controls">
+                                  <a id="cancel" href="/home" class="btn btn-success">Cancel</a>
+                                </div>
+                            </div>
+
+                        </form>     
+                    </div>                     
+                </div>
+                <div id="successDiv" style="display: none" >
+                    <p >
+                    <font face="sans-serif" size="4" color="green"></font></p>
+                </div>
+        </div>
+        
+    </div>
+    <script type="text/javascript">
+    window.onload = function (){
+        var msg = $("#msg").val();
+        if (msg != ""){
+            $("#successDiv").css("display","block");
+            $("#successDiv p font").text(msg)
+            $("#cancel").text("Go Back")
+        }
+     }();
+     </script>
